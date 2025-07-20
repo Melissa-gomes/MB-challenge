@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  db: 
+    image: postgres:14
+
+    container_name: db-postgres
+
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=sample
+      - POSTGRES_HOST=localhost
+      - SSLMODE=disable
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  api:
+    container_name: ordersBook
+
+    build: .
+
+    env_file:
+      - .env
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - .:/app
+    
+    restart: always
+
+    depends_on:
+      - db
+
+volumes:
+  db:
