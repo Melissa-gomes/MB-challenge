@@ -75,7 +75,6 @@ func (m *MockRepo) UpdateStatusOrder(status int, orderId string) (models.Orders,
 func TestCreateOrder(t *testing.T) {
 	mockRepo := new(MockRepo)
 	svc := service.NewService(mockRepo)
-	svc.DisableAsync = true
 
 	client := models.Client{
 		Id:         uuid.MustParse("0ee49ba6-30e6-4b8e-bfec-5bda90aa48ca"),
@@ -95,6 +94,7 @@ func TestCreateOrder(t *testing.T) {
 		}
 		mockRepo.On("GetClientById", order.OwnerOrderId.String()).Return(client, nil)
 		mockRepo.On("CreateOrder", mock.Anything).Return(order, nil)
+		mockRepo.On("FindMatchOrderToBuy", mock.Anything).Return(models.Orders{}, models.ErrorNotFound)
 
 		id, err := svc.CreateOrder(order)
 

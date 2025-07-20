@@ -11,8 +11,7 @@ import (
 )
 
 type Service struct {
-	Repo         contracts.OperationsRepositoryHandle
-	DisableAsync bool
+	Repo contracts.OperationsRepositoryHandle
 }
 
 func NewService(repo contracts.OperationsRepositoryHandle) *Service {
@@ -67,10 +66,12 @@ func (s Service) CreateOrder(order models.Orders) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if !s.DisableAsync {
-		go func(order models.Orders) {
-			s.FindMatchOrder(order)
-		}(order)
+
+	err = s.FindMatchOrder(order)
+	if err != nil {
+		if errors.Is(err, models.ErrorNotFound) {
+			return res.Id.String(), nil
+		}
 	}
 
 	return res.Id.String(), nil

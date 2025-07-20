@@ -47,21 +47,21 @@ func Seeders(db *gorm.DB) {
 	clients := []models.Client{
 		{
 			Id:         uuid.MustParse("b7050560-3387-4318-812d-f671ae9caa6e"),
-			BalanceBRL: 12.533,
+			BalanceBRL: 12533,
 			BalanceBT:  4,
 			Score:      70,
 			CreatedAt:  time.Now(),
 		},
 		{
 			Id:         uuid.MustParse("2268237d-1079-47e8-b7b2-8ab9ae1942f5"),
-			BalanceBRL: 994.533,
+			BalanceBRL: 994533,
 			BalanceBT:  12,
 			Score:      99,
 			CreatedAt:  time.Now(),
 		},
 		{
 			Id:         uuid.MustParse("d3909b31-045b-4c3e-a6f8-2edb54316b37"),
-			BalanceBRL: 18.485,
+			BalanceBRL: 18485,
 			BalanceBT:  7,
 			Score:      95,
 			CreatedAt:  time.Now(),
