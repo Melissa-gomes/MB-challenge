@@ -61,17 +61,6 @@ func (m *MockRepo) UpdateStatusOrder(status int, orderId string) (models.Orders,
 	return args.Get(0).(models.Orders), args.Error(1)
 }
 
-// Testes:
-// CreateOrder:
-// [x] Deve falhar caso não encontre um cliente no banco relacionado aquela order
-// [x] Deve falhar se houver algum problema em conectar no banco
-// [x] Deve falhar se o tipo da order for menor que 1
-// [x] Deve falhar se o tipo da order for maior que 2
-// [x] Deve falhar se o status da order for menor que 1
-// [x] Deve falhar se o status da order for maior que 4
-// [x] Deve falhar se o preco dar order em BRL for menor ou igual a 0
-// [x] Deve falhar se o preco dar order em BT for menor ou igual a 0
-// [x] Deve criar uma order com sucesso e retornar o id dela.
 func TestCreateOrder(t *testing.T) {
 	mockRepo := new(MockRepo)
 	svc := service.NewService(mockRepo)
@@ -100,6 +89,48 @@ func TestCreateOrder(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, id)
+
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("It should fail if the order is a purchase order and the customer's BRL balance is less than the amount in their account.", func(t *testing.T) {
+		order := models.Orders{
+			Id:            uuid.MustParse("b794a8dc-415e-435c-8a44-551cf8244e68"),
+			TypeOrder:     1,
+			Status:        1,
+			PriceOrderBT:  100,
+			PriceOrderBRL: 25447,
+			OwnerOrderId:  uuid.MustParse("0ee49ba6-30e6-4b8e-bfec-5bda90aa48ca"),
+		}
+		order.OwnerOrderId = uuid.MustParse("a7402f4d-e180-4963-bcc7-e02371a39dca")
+
+		mockRepo.On("GetClientById", "a7402f4d-e180-4963-bcc7-e02371a39dca").Return(models.Client{}, models.ErrorInsufficientBalance)
+
+		id, err := svc.CreateOrder(order)
+
+		assert.Error(t, err)
+		assert.Empty(t, id)
+
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("It should fail if the order is a sell order and the customer's BT balance is less than the amount in their account.", func(t *testing.T) {
+		order := models.Orders{
+			Id:            uuid.MustParse("b794a8dc-415e-435c-8a44-551cf8244e68"),
+			TypeOrder:     2,
+			Status:        1,
+			PriceOrderBT:  25447,
+			PriceOrderBRL: 500,
+			OwnerOrderId:  uuid.MustParse("0ee49ba6-30e6-4b8e-bfec-5bda90aa48ca"),
+		}
+		order.OwnerOrderId = uuid.MustParse("a7402f4d-e180-4963-bcc7-e02371a39dca")
+
+		mockRepo.On("GetClientById", "a7402f4d-e180-4963-bcc7-e02371a39dca").Return(models.Client{}, models.ErrorInsufficientBalance)
+
+		id, err := svc.CreateOrder(order)
+
+		assert.Error(t, err)
+		assert.Empty(t, id)
 
 		mockRepo.AssertExpectations(t)
 	})
@@ -242,8 +273,6 @@ func TestCreateOrder(t *testing.T) {
 
 }
 
-// ListOrders:
-// [x] Deve retorar um array com todas as orders cadastradas
 func TestListOrders(t *testing.T) {
 	mockRepo := new(MockRepo)
 	svc := service.NewService(mockRepo)
@@ -304,15 +333,6 @@ func TestListOrders(t *testing.T) {
 	})
 }
 
-// // UpdateStatusOrder:
-// // [X] Deve falhar se o status da order for menor que 1
-// // [X] Deve falhar se o status da order for maior que 4
-// // [X] Deve falhar caso não encontre a order
-// // [x] Deve falhar se a order já estiver done
-// // [x] Deve falhar se a order já estiver cancela
-// // [x] Deve retornar "status in effect for this order" se o status enviado for o mesmo que já se encontra na order
-// // [x] Deve falhar se uma order estiver waiting e tentarem mudar o status para algo diferente de OPEN ou CANCEL
-// // [x] Deve atualizar com sucesso
 func TestUpdateStatusOrder(t *testing.T) {
 	mockRepo := new(MockRepo)
 	svc := service.NewService(mockRepo)
@@ -452,9 +472,6 @@ func TestUpdateStatusOrder(t *testing.T) {
 	})
 }
 
-// // GetClientById:
-// // [x] Deve falhar caso não encontre o cliente
-// // [x] Deve retornar o cliente
 func TestGetClientById(t *testing.T) {
 	mockRepo := new(MockRepo)
 	svc := service.NewService(mockRepo)

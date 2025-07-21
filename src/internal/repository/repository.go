@@ -18,7 +18,6 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-// ORDERS
 func (r Repository) CreateOrder(order models.Orders) (models.Orders, error) {
 	if result := r.DB.Create(&order); result.Error != nil {
 		return models.Orders{}, models.NewError(models.ErrorKindDatabase, "database error: "+result.Error.Error(), models.StatusCodeInternal)
@@ -213,7 +212,6 @@ func (r Repository) UpdateStatusOrder(status int, orderId string) (models.Orders
 	return order, nil
 }
 
-// CLIENTS
 func (r Repository) GetClientById(id string) (models.Client, error) {
 	var client models.Client
 

@@ -132,4 +132,5 @@ var (
 	ErrorInvalidUpdateOrderDone    = NewError(ErrorKindInvalidInput, "invalid update, this order was done", StatusCodeInvalidInput)
 	ErrorInvalidUpdateOrderCancel  = NewError(ErrorKindInvalidInput, "invalid update, this order was cancel", StatusCodeInvalidInput)
 	ErrorInvalidUpdateOrderWaiting = NewError(ErrorKindInvalidInput, "invalid update, An order waiting only change status to OPEN or CANCEL", StatusCodeInvalidInput)
+	ErrorInsufficientBalance       = NewError(ErrorKindInvalidInput, "insufficient balance", StatusCodeInvalidInput)
 )

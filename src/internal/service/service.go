@@ -48,6 +48,14 @@ func (s Service) CreateOrder(order models.Orders) (string, error) {
 		return "", models.ErrorNotFound
 	}
 
+	if order.TypeOrder == 1 && owner.BalanceBRL < order.PriceOrderBRL {
+		return "", models.ErrorInsufficientBalance
+	}
+
+	if order.TypeOrder == 2 && owner.BalanceBT < order.PriceOrderBT {
+		return "", models.ErrorInsufficientBalance
+	}
+
 	if order.TypeOrder < 1 || order.TypeOrder > 2 {
 		return "", models.ErrorInvalidTypeOrder
 	}
